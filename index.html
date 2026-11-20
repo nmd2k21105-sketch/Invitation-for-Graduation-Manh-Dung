@@ -321,7 +321,7 @@ $("venue").textContent = CONFIG.venue;
 $("addr").textContent = CONFIG.address;
 $("msg").textContent = CONFIG.message;
 $("rsvpBy").textContent = CONFIG.rsvpBy;
-$("mapBtn").href = "https://maps.apple.com/?q=" + encodeURIComponent(CONFIG.venue + ", " + CONFIG.address);
+$("mapBtn").href = "https://www.google.com/maps/search/?api=1&query=" + encodeURIComponent(CONFIG.venue + ", " + CONFIG.address);
 CONFIG.placeholders.forEach(k => document.querySelectorAll(`[data-key="${k}"]`).forEach(el => el.classList.add("tbc")));
 
 /* Personal link: ...?to=Anh%20Tuấn  →  "For Anh Tuấn" / "Dear Anh Tuấn," */
