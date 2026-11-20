@@ -193,7 +193,7 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
 .accept{background:var(--wax);color:#fff;box-shadow:0 8px 18px rgba(125,26,46,.35)}
 .decline{background:rgba(255,255,255,.6);color:var(--ink-soft);border:1px solid rgba(90,174,224,.55)}
 .decline.flee{position:fixed;z-index:30;margin:0;background:#fff;box-shadow:0 8px 20px rgba(0,0,0,.25);
-  text-transform:none;letter-spacing:.01em;font-style:italic;font-size:17px;white-space:normal;max-width:230px;line-height:1.25;padding:10px 16px;
+  text-transform:none;letter-spacing:0;font-style:italic;font-size:15px;white-space:normal;max-width:150px;min-height:0;line-height:1.2;padding:7px 12px;border-radius:12px;
   transition:opacity .16s ease, transform .16s ease}
 .decline.flee.poof{opacity:0;transform:scale(.3) rotate(-12deg)}
 .decline.flee.pop{animation:pop .42s cubic-bezier(.3,1.6,.5,1)}
@@ -383,7 +383,7 @@ $("replay").addEventListener("click", closeLetter);
 /* ---------- Accept / Decline ---------- */
 const decline = $("decline"), accept = $("accept");
 const lines = ["Decline", "No no, you don't love me 😢", "Nooo… really? 🥺", "My heart just broke 💔", "Please come 🥹", "I'll cry at dinner 😭", "Just press Accept 🙏"];
-let dodges = 0, busy = false;
+let dodges = 0, busy = false, slot = null;
 /* the visible screen, minus Dynamic Island / home bar and a margin for the pop bounce */
 function bounds(w, h) {
   const vv = window.visualViewport;
@@ -396,6 +396,17 @@ function bounds(w, h) {
   const minX = ox + sL + m, maxX = Math.max(minX, ox + vw - sR - m - w);
   const minY = oy + Math.max(sT, 20) + m, maxY = Math.max(minY, oy + vh - Math.max(sB, 12) - m - h);
   return { minX, maxX, minY, maxY };
+}
+function obstacles() {
+  const out = [];
+  const card = document.querySelector(".card");
+  card.querySelectorAll(".mono,.date,.rule,.btn,#accept,.replay").forEach(el => out.push(el.getBoundingClientRect()));
+  card.querySelectorAll(".dear,.pre,.occasion,.of,.name,.month,.venue,.addr,.msg,.rsvpby,.thanks").forEach(el => {
+    if (el.hidden || !el.textContent.trim()) return;
+    const rg = document.createRange(); rg.selectNodeContents(el);
+    for (const q of rg.getClientRects()) out.push(q);
+  });
+  return out;
 }
 function clampDecline() {
   if (!decline.classList.contains("flee")) return;
@@ -412,24 +423,26 @@ function flee(e) {
   if (busy || decline.hidden) return; busy = true;
   const r = decline.getBoundingClientRect();
   if (!decline.classList.contains("flee")) {          // lift it out of the card
-    Object.assign(decline.style, { left: r.left + "px", top: r.top + "px", minWidth: Math.min(r.width, 200) + "px" });
+    slot = { x: r.left, y: r.top, w: r.width, h: r.height };   // its home spot stays empty
+    Object.assign(decline.style, { left: r.left + "px", top: r.top + "px" });
     decline.classList.add("flee"); document.body.appendChild(decline);
-    $("rsvp").classList.add("solo");
   }
   decline.classList.remove("pop"); decline.classList.add("poof");          // vanish…
   setTimeout(() => {
     decline.textContent = lines[1 + (dodges++ % (lines.length - 1))];
     const w = decline.offsetWidth, h = decline.offsetHeight;
-    const a = accept.getBoundingClientRect();
-    const b = bounds(w, h);
-    let x, y, tries = 0;
-    do {
-      x = b.minX + Math.random() * (b.maxX - b.minX);
-      y = b.minY + Math.random() * (b.maxY - b.minY);
-      tries++;
-    } while (tries < 60 && (
-      (x < a.right + 14 && x + w > a.left - 14 && y < a.bottom + 14 && y + h > a.top - 14) ||   // never cover Accept
-      Math.hypot(x - r.left, y - r.top) < 160));                                             // land far away
+    const b = bounds(w, h), blocks = obstacles(), gap = 6;
+    const free = (x, y) => !blocks.some(o => x < o.right + gap && x + w > o.left - gap && y < o.bottom + gap && y + h > o.top - gap);
+    const spots = [];
+    for (let i = 0; i < 600; i++) {
+      const x = b.minX + Math.random() * (b.maxX - b.minX), y = b.minY + Math.random() * (b.maxY - b.minY);
+      if (free(x, y)) spots.push([x, y]);
+    }
+    const far = spots.filter(([x, y]) => Math.hypot(x - r.left, y - r.top) > 90);
+    const pick = far.length ? far : spots;
+    let x, y;
+    if (pick.length) [x, y] = pick[Math.floor(Math.random() * pick.length)];
+    else { x = slot.x + (slot.w - w) / 2; y = slot.y + (slot.h - h) / 2; }   // no gap big enough → go home
     decline.style.left = x + "px"; decline.style.top = y + "px";
     decline.classList.remove("poof"); decline.classList.add("pop");            // …and pop up elsewhere
     setTimeout(() => { busy = false; }, 380);
@@ -471,7 +484,7 @@ function resetRsvp() {
   stopAuto();
   dodges = 0; busy = false; decline.textContent = lines[0]; decline.classList.remove("poof", "pop");
   decline.classList.remove("flee"); decline.removeAttribute("style"); decline.hidden = false;
-  $("rsvp").appendChild(decline); $("rsvp").classList.remove("solo");
+  $("rsvp").appendChild(decline); slot = null;
   $("rsvp").hidden = false; $("thanks").hidden = true;
 }
 
