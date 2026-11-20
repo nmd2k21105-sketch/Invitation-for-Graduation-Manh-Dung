@@ -393,9 +393,13 @@ function bounds(w, h) {
   const sT = parseFloat(cs.paddingTop) || 0, sB = parseFloat(cs.paddingBottom) || 0;
   const sL = parseFloat(cs.paddingLeft) || 0, sR = parseFloat(cs.paddingRight) || 0;
   const m = 14;                                   // breathing room so the bounce never pokes off-screen
-  const minX = ox + sL + m, maxX = Math.max(minX, ox + vw - sR - m - w);
-  const minY = oy + Math.max(sT, 20) + m, maxY = Math.max(minY, oy + vh - Math.max(sB, 12) - m - h);
-  return { minX, maxX, minY, maxY };
+  const barTop = 60, barBottom = 70;              // Safari status bar / floating toolbar can cover these
+  const c = document.querySelector(".card").getBoundingClientRect(), inset = 18;   // stay inside the inner border
+  const minX = Math.max(ox + sL + m, c.left + inset);
+  const maxX = Math.min(ox + vw - sR - m, c.right - inset) - w;
+  const minY = Math.max(oy + Math.max(sT, barTop) + m, c.top + inset);
+  const maxY = Math.min(oy + vh - Math.max(sB, barBottom) - m, c.bottom - inset) - h;
+  return { minX, maxX, minY, maxY, ok: maxX >= minX && maxY >= minY };
 }
 function obstacles() {
   const out = [];
@@ -411,11 +415,17 @@ function obstacles() {
 function clampDecline() {
   if (!decline.classList.contains("flee")) return;
   const b = bounds(decline.offsetWidth, decline.offsetHeight);
+  if (!b.ok) return;
   const x = parseFloat(decline.style.left), y = parseFloat(decline.style.top);
   decline.style.left = Math.min(Math.max(x, b.minX), b.maxX) + "px";
   decline.style.top  = Math.min(Math.max(y, b.minY), b.maxY) + "px";
 }
 addEventListener("resize", clampDecline);
+$("invite").addEventListener("scroll", () => {      // card scrolled words under it → jump away
+  if (!decline.classList.contains("flee") || decline.hidden) return;
+  const r = decline.getBoundingClientRect();
+  if (obstacles().some(o => r.left < o.right && r.right > o.left && r.top < o.bottom && r.bottom > o.top)) flee();
+}, { passive: true });
 if (window.visualViewport) visualViewport.addEventListener("resize", clampDecline);
 function flee(e) {
   if (e && e.cancelable) e.preventDefault();
@@ -434,7 +444,7 @@ function flee(e) {
     const b = bounds(w, h), blocks = obstacles(), gap = 6;
     const free = (x, y) => !blocks.some(o => x < o.right + gap && x + w > o.left - gap && y < o.bottom + gap && y + h > o.top - gap);
     const spots = [];
-    for (let i = 0; i < 600; i++) {
+    for (let i = 0; b.ok && i < 800; i++) {
       const x = b.minX + Math.random() * (b.maxX - b.minX), y = b.minY + Math.random() * (b.maxY - b.minY);
       if (free(x, y)) spots.push([x, y]);
     }
