@@ -1,0 +1,483 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#24070f">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<title>Graduation Dinner · Mạnh Dũng</title>
+<meta name="description" content="You're invited to Mạnh Dũng's graduation dinner.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Great+Vibes&display=swap" rel="stylesheet">
+<style>
+:root{
+  /* Burgundy × sky blue — near-complementary hues (≈350° vs ≈205°),
+     pushed apart in lightness so each one makes the other glow */
+  --night:#24070f; --night-2:#4a1222;          /* deep burgundy backdrop */
+  --paper:#f6fafd; --paper-2:#e3f1fb; --paper-3:#bcdcf1;   /* sky-tinted paper */
+  --ink:#4a1020; --ink-soft:#7a5560;           /* burgundy text (14.4:1, 6.1:1) */
+  --gold:#5aaee0; --gold-soft:#9fd3f2;         /* sky accents (decorative) */
+  --sky-ink:#2a6f9c;                           /* sky for small text (5.2:1) */
+  --wax:#7d1a2e; --wax-dark:#4a0d1a;
+  --serif:"Cormorant Garamond", Georgia, serif;
+  --script:"Great Vibes", "Snell Roundhand", cursive;
+  --env-w:min(86vw, 380px);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+body{
+  background:radial-gradient(120% 80% at 50% 35%, var(--night-2) 0%, var(--night) 70%);
+  background-color:var(--night);
+  color:var(--ink); font-family:var(--serif);
+  overflow:hidden; overscroll-behavior:none;
+  -webkit-font-smoothing:antialiased; -webkit-tap-highlight-color:transparent;
+  touch-action:manipulation;
+}
+[hidden]{display:none!important}
+button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
+
+/* ---------- faint starfield ---------- */
+.sky{position:fixed;inset:0;pointer-events:none;opacity:.55;
+  background-image:
+    radial-gradient(1px 1px at 12% 18%, var(--gold-soft) 50%, transparent 51%),
+    radial-gradient(1px 1px at 78% 12%, var(--gold-soft) 50%, transparent 51%),
+    radial-gradient(1.5px 1.5px at 64% 30%, #fff 50%, transparent 51%),
+    radial-gradient(1px 1px at 30% 72%, var(--gold-soft) 50%, transparent 51%),
+    radial-gradient(1px 1px at 88% 66%, #fff 50%, transparent 51%),
+    radial-gradient(1.5px 1.5px at 18% 88%, var(--gold-soft) 50%, transparent 51%),
+    radial-gradient(1px 1px at 52% 92%, #fff 50%, transparent 51%),
+    radial-gradient(1px 1px at 40% 8%, #fff 50%, transparent 51%);
+}
+
+/* ---------- STAGE 1: the envelope ---------- */
+.stage{
+  position:fixed; inset:0;
+  display:flex; flex-direction:column; align-items:center; justify-content:center;
+  gap:clamp(28px, 6dvh, 56px);
+  padding:env(safe-area-inset-top) 16px env(safe-area-inset-bottom);
+  transition:opacity .7s ease, transform .9s cubic-bezier(.2,.7,.2,1);
+}
+.kicker{color:var(--gold-soft);text-align:center;letter-spacing:.32em;text-transform:uppercase;font-size:13px;font-weight:500}
+.kicker .to{display:block;margin-top:10px;font-family:var(--script);font-size:34px;letter-spacing:0;text-transform:none;color:var(--paper)}
+.hint{color:rgba(223,240,251,.8);font-size:15px;letter-spacing:.18em;text-transform:uppercase;animation:breathe 2.4s ease-in-out infinite}
+@keyframes breathe{0%,100%{opacity:.65}50%{opacity:1}}
+
+.env{
+  position:relative; width:var(--env-w); aspect-ratio:1.42/1;
+  perspective:1200px; animation:float 5s ease-in-out infinite;
+  filter:drop-shadow(0 22px 30px rgba(0,0,0,.45));
+}
+@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-7px)}}
+.env-back{position:absolute;inset:0;background:var(--paper-3);border-radius:6px}
+.letter{
+  position:absolute; left:5%; width:90%; top:6%; height:90%;
+  background:var(--paper); border-radius:4px; z-index:2;
+  box-shadow:0 -2px 10px rgba(0,0,0,.08);
+  display:flex; flex-direction:column; align-items:center; padding-top:7%;
+  transition:transform 1s cubic-bezier(.3,.7,.2,1) 1.05s;
+}
+.letter .mono{width:42px;height:42px;font-size:15px}
+.letter .pre{margin-top:8px;font-size:11px;letter-spacing:.3em;text-transform:uppercase;color:var(--ink-soft)}
+.letter .title{font-family:var(--script);font-size:34px;color:var(--ink);line-height:1.1;margin-top:2px}
+.pocket{position:absolute;inset:0;z-index:3;border-radius:6px;overflow:hidden;pointer-events:none}
+.pocket i{position:absolute;inset:0;display:block}
+.pocket .l{background:linear-gradient(100deg,var(--paper-2),#d2e8f7);clip-path:polygon(0 0,52% 54%,0 100%)}
+.pocket .r{background:linear-gradient(260deg,var(--paper-2),#d2e8f7);clip-path:polygon(100% 0,48% 54%,100% 100%)}
+.pocket .b{background:linear-gradient(0deg,#e8f4fc,var(--paper-2));clip-path:polygon(0 100%,50% 47%,100% 100%)}
+.flap{
+  position:absolute; left:0; right:0; top:0; height:100%; z-index:4;
+  transform-origin:50% 0; transform-style:preserve-3d;
+  background:linear-gradient(180deg,#eaf5fc,var(--paper-2));
+  clip-path:polygon(0 0,100% 0,50% 60%);
+  transition:transform .75s cubic-bezier(.45,.05,.3,1) .3s;
+}
+.seal{
+  position:absolute; left:50%; top:60%; z-index:5;
+  width:68px; height:68px; transform:translate(-50%,-50%);
+  border-radius:50%;
+  background:radial-gradient(circle at 35% 30%, #a8344a, var(--wax) 55%, var(--wax-dark));
+  box-shadow:0 3px 8px rgba(0,0,0,.35), inset 0 0 0 5px rgba(0,0,0,.12), inset 0 0 0 7px rgba(255,255,255,.06);
+  display:grid; place-items:center;
+  color:rgba(214,238,253,.92); font-family:var(--script); font-size:28px;
+  text-shadow:0 1px 0 rgba(0,0,0,.4);
+  transition:transform .4s ease, opacity .35s ease;
+}
+.seal::after{content:"";position:absolute;inset:-14px;border-radius:50%;border:1px solid rgba(159,211,242,.7);animation:ping 2.4s ease-out infinite}
+@keyframes ping{0%{transform:scale(.8);opacity:.9}100%{transform:scale(1.35);opacity:0}}
+
+/* opening sequence */
+.opening .env{animation:none}
+.opening .seal{transform:translate(-50%,-50%) scale(1.25);opacity:0}
+.opening .seal::after{display:none}
+.opening .flap{transform:rotateX(180deg)}
+.flap.behind{z-index:1}
+.opening .letter{transform:translateY(-62%)}
+.opening .hint{opacity:0;animation:none;transition:opacity .3s}
+.show-invite .stage{opacity:0;transform:translateY(40px) scale(.94);pointer-events:none}
+
+/* ---------- STAGE 2: the invitation ---------- */
+.invite{
+  position:fixed; inset:0; z-index:10;
+  padding:calc(env(safe-area-inset-top) + 10px) 14px calc(env(safe-area-inset-bottom) + 10px);
+  display:flex; align-items:center; justify-content:center;
+  overflow-y:auto; -webkit-overflow-scrolling:touch;
+  opacity:0; visibility:hidden; transform:scale(.92) translateY(-30px);
+  transition:opacity .8s ease, transform .9s cubic-bezier(.2,.7,.2,1), visibility 0s .9s;
+}
+.show-invite .invite{opacity:1;visibility:visible;transform:none;transition:opacity .8s ease .1s, transform .9s cubic-bezier(.2,.7,.2,1) .1s}
+.card{
+  position:relative; width:100%; max-width:420px; margin:auto;
+  background:var(--paper);
+  background-image:radial-gradient(140% 90% at 50% 0%, #ffffff 0%, var(--paper) 55%, var(--paper-2) 100%);
+  border-radius:16px; padding:22px 22px 12px;
+  box-shadow:0 30px 60px rgba(0,0,0,.45);
+  text-align:center;
+}
+.card::before{content:"";position:absolute;inset:9px;border:1px solid var(--gold);border-radius:10px;pointer-events:none}
+.card::after{content:"";position:absolute;inset:13px;border:.5px solid rgba(90,174,224,.45);border-radius:8px;pointer-events:none}
+.card > *{position:relative;z-index:1}
+.reveal{opacity:0;transform:translateY(10px)}
+.show-invite .reveal{animation:rise .8s cubic-bezier(.2,.7,.2,1) forwards}
+@keyframes rise{to{opacity:1;transform:none}}
+
+.mono{
+  width:54px;height:54px;margin:0 auto;border-radius:50%;
+  border:1px solid var(--gold); display:grid; place-items:center;
+  font-family:var(--serif); font-weight:500; letter-spacing:.08em; font-size:18px; color:var(--sky-ink);
+  box-shadow:inset 0 0 0 3px var(--paper), inset 0 0 0 4px rgba(90,174,224,.45);
+}
+.dear{margin-top:8px;font-style:italic;font-size:19px;color:var(--ink-soft)}
+.dear:empty{display:none}
+.pre{margin-top:10px;font-size:12px;letter-spacing:.32em;text-transform:uppercase;color:var(--ink-soft);font-weight:500}
+.occasion{font-family:var(--script);font-size:clamp(46px,13vw,58px);line-height:1.05;color:var(--ink);margin-top:6px}
+.of{font-style:italic;font-size:17px;color:var(--ink-soft);margin-top:2px}
+.name{font-size:clamp(30px,8.6vw,38px);font-weight:500;letter-spacing:.14em;text-transform:uppercase;line-height:1.15;margin-top:4px}
+.sub{font-size:14px;letter-spacing:.16em;text-transform:uppercase;color:var(--gold);margin-top:8px;font-weight:600}
+.sub:empty{display:none}
+.rule{display:flex;align-items:center;gap:10px;margin:10px auto;width:72%;color:var(--gold)}
+.rule::before,.rule::after{content:"";flex:1;height:1px;background:currentColor;opacity:.6}
+.rule span{font-size:12px}
+
+.date{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:14px}
+.date .side{font-size:13px;letter-spacing:.24em;text-transform:uppercase;padding:9px 0;border-top:1px solid rgba(90,174,224,.6);border-bottom:1px solid rgba(90,174,224,.6);font-weight:600}
+.date .day{font-size:56px;line-height:1;font-weight:500}
+.month{font-size:15px;letter-spacing:.3em;text-transform:uppercase;margin-top:8px;color:var(--ink-soft);font-weight:600}
+.venue{margin-top:10px;font-size:22px;font-weight:600}
+.addr{font-size:17px;color:var(--ink-soft);margin-top:2px}
+.msg{margin:12px auto 0;max-width:31ch;font-style:italic;font-size:17px;line-height:1.4;color:var(--ink)}
+
+.actions{display:grid;grid-template-columns:1fr;gap:8px;margin-top:12px}
+.actions .btn{min-height:42px}
+#calBtn,#mapBtn{text-transform:none;letter-spacing:.03em;font-size:16px}
+.btn svg{flex-shrink:0}
+.btn{
+  display:flex;flex-direction:row;align-items:center;justify-content:center;gap:8px;
+  padding:0 8px;border-radius:999px;min-height:44px;
+  border:1px solid rgba(90,174,224,.55); color:var(--ink); text-decoration:none;
+  font-size:13px;letter-spacing:.08em;text-transform:uppercase;font-weight:600;
+  background:rgba(255,255,255,.35); transition:transform .15s, background .15s;
+}
+.btn:active{transform:scale(.96);background:rgba(90,174,224,.15)}
+.btn svg{width:19px;height:19px;stroke:var(--sky-ink);fill:none;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
+.btn.primary{background:var(--wax);color:#fff;border-color:var(--wax);box-shadow:0 6px 16px rgba(125,26,46,.35)}
+.btn.primary svg{stroke:var(--gold-soft)}
+.rsvpby{margin:8px auto 0;max-width:32ch;line-height:1.35;font-size:14px;color:var(--ink-soft);font-style:italic}
+.replay{margin-top:2px;font-size:12px;letter-spacing:.2em;text-transform:uppercase;color:var(--ink-soft);opacity:.7;padding:8px}
+
+.rsvp{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px}
+.rsvp.solo{grid-template-columns:1fr}
+.choice{min-height:54px;border-radius:14px;font-size:15px;letter-spacing:.16em;text-transform:uppercase;font-weight:600;white-space:nowrap;padding:0 14px;transition:transform .15s}
+.choice:active{transform:scale(.96)}
+.accept{background:var(--wax);color:#fff;box-shadow:0 8px 18px rgba(125,26,46,.35)}
+.decline{background:rgba(255,255,255,.6);color:var(--ink-soft);border:1px solid rgba(90,174,224,.55)}
+.decline.flee{position:fixed;z-index:30;margin:0;background:#fff;box-shadow:0 8px 20px rgba(0,0,0,.25);
+  text-transform:none;letter-spacing:.01em;font-style:italic;font-size:17px;white-space:normal;max-width:230px;line-height:1.25;padding:10px 16px;
+  transition:opacity .16s ease, transform .16s ease}
+.decline.flee.poof{opacity:0;transform:scale(.3) rotate(-12deg)}
+.decline.flee.pop{animation:pop .42s cubic-bezier(.3,1.6,.5,1)}
+@keyframes pop{0%{transform:scale(.3) rotate(10deg)}100%{transform:none}}
+.thanks{margin-top:12px;padding:14px;border-radius:14px;background:rgba(125,26,46,.07);border:1px solid rgba(125,26,46,.25);animation:rise .6s cubic-bezier(.2,.7,.2,1)}
+.thanks .yay{font-family:var(--script);font-size:36px;color:var(--wax);line-height:1.1}
+.thanks .when{font-size:14px;letter-spacing:.18em;text-transform:uppercase;color:var(--sky-ink);font-weight:600;margin-top:4px}
+
+/* placeholder marker — remove once real details are in */
+.tbc{outline:2px dashed #e0a800;outline-offset:4px;border-radius:4px}
+
+/* gold sparkles burst */
+.spark{position:fixed;width:6px;height:6px;border-radius:50%;background:var(--gold-soft);pointer-events:none;z-index:20;
+  box-shadow:0 0 6px var(--gold-soft);animation:spark 1.3s ease-out forwards}
+@keyframes spark{0%{opacity:1;transform:translate(0,0) scale(1)}100%{opacity:0;transform:translate(var(--dx),var(--dy)) scale(.3)}}
+
+@media (prefers-reduced-motion:reduce){
+  .env,.hint,.seal::after{animation:none}
+  .flap,.letter,.seal,.stage,.invite{transition-duration:.01s!important;transition-delay:0s!important}
+  .show-invite .reveal{animation:none;opacity:1;transform:none}
+}
+</style>
+</head>
+<body>
+<div class="sky" aria-hidden="true"></div>
+<div id="safe" aria-hidden="true" style="position:fixed;visibility:hidden;pointer-events:none;top:0;left:0;padding:env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left)"></div>
+
+<!-- STAGE 1 -->
+<main class="stage" id="stage">
+  <p class="kicker">A letter for you<span class="to" id="toName"></span></p>
+  <button class="env" id="env" aria-label="Open the invitation">
+    <span class="env-back"></span>
+    <span class="letter" aria-hidden="true">
+      <span class="mono">MD</span>
+      <span class="pre">You're invited</span>
+      <span class="title">Graduation Dinner</span>
+    </span>
+    <span class="pocket" aria-hidden="true"><i class="l"></i><i class="r"></i><i class="b"></i></span>
+    <span class="flap" id="flap" aria-hidden="true"></span>
+    <span class="seal" aria-hidden="true">D</span>
+  </button>
+  <p class="hint">Tap the seal to open</p>
+</main>
+
+<!-- STAGE 2 -->
+<section class="invite" id="invite" aria-label="Invitation">
+  <article class="card">
+    <div class="mono reveal" style="animation-delay:.15s">MD</div>
+    <p class="dear reveal" id="dear" style="animation-delay:.25s"></p>
+    <p class="pre reveal" style="animation-delay:.3s">Please join me for a</p>
+    <h1 class="occasion reveal" style="animation-delay:.4s">Graduation Dinner</h1>
+    <p class="of reveal" style="animation-delay:.5s">celebrating</p>
+    <h2 class="name reveal" style="animation-delay:.55s" id="hostName"></h2>
+    <p class="sub reveal" style="animation-delay:.65s" id="sub"></p>
+
+    <div class="rule reveal" style="animation-delay:.75s"><span>✦</span></div>
+
+    <div class="reveal" style="animation-delay:.85s">
+      <div class="date">
+        <div class="side" id="weekday"></div>
+        <div class="day" id="day"></div>
+        <div class="side" id="time" data-key="time"></div>
+      </div>
+      <div class="month" id="monthYear"></div>
+    </div>
+
+    <div class="reveal" style="animation-delay:.95s">
+      <p class="venue" data-key="venue" id="venue"></p>
+      <p class="addr" data-key="address" id="addr"></p>
+    </div>
+
+    <p class="msg reveal" style="animation-delay:1.05s" id="msg"></p>
+
+    <div class="actions reveal" style="animation-delay:1.15s">
+      <button class="btn" id="calBtn">
+        <svg viewBox="0 0 24 24"><rect x="3.5" y="5" width="17" height="15" rx="2"/><path d="M3.5 10h17M8 3v4M16 3v4"/></svg><span>Add this event to your calendar</span>
+      </button>
+      <a class="btn" id="mapBtn" target="_blank" rel="noopener">
+        <svg viewBox="0 0 24 24"><path d="M12 21s-7-6.2-7-11.5A7 7 0 0 1 19 9.5C19 14.8 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.5"/></svg><span>Directions</span>
+      </a>
+    </div>
+    <p class="rsvpby reveal" style="animation-delay:1.25s" data-key="rsvpBy" id="rsvpBy"></p>
+    <div class="rsvp reveal" style="animation-delay:1.3s" id="rsvp">
+      <button class="choice accept" id="accept">Accept</button>
+      <button class="choice decline" id="decline">Decline</button>
+    </div>
+    <div class="thanks" id="thanks" hidden>
+      <p class="yay">Yay — see you there!</p>
+      <p class="when" id="thanksWhen"></p>
+    </div>
+    <button class="replay reveal" style="animation-delay:1.35s" id="replay">↺ Close the letter</button>
+  </article>
+</section>
+
+<script>
+/* ============ EDIT YOUR DETAILS HERE ============ */
+const CONFIG = {
+  hostShort: "Mạnh Dũng",
+  monogram: "MD",
+  subtitle: "",
+  start: "2026-12-16T19:30:00+11:00",   // Wed 16 Dec 2026, 7:30 pm Melbourne
+  durationHours: 2.5,                     // restaurant closes 10 pm on Wednesdays
+  venue: "Old Beijing",
+  address: "31–37 Artemis Lane, Melbourne VIC 3000",
+  message: "It's a little milestone of mine, and I'd love to share the story of my journey with you all. Your presence would mean so much to me.",
+  rsvpBy: "If you can't make it, please let me know — I'd love to see you soon 😊",
+  // fields still to confirm — highlighted in yellow until removed from this list
+  placeholders: []
+};
+/* ================================================ */
+
+const $ = id => document.getElementById(id);
+const tz = "Australia/Melbourne";
+const start = new Date(CONFIG.start);
+const end = new Date(start.getTime() + CONFIG.durationHours * 3600e3);
+const fmt = o => new Intl.DateTimeFormat("en-AU", { timeZone: tz, ...o }).format(start);
+
+$("hostName").textContent = CONFIG.hostShort;
+$("sub").textContent = CONFIG.subtitle;
+$("weekday").textContent = fmt({ weekday: "long" });
+$("day").textContent = fmt({ day: "numeric" });
+$("time").textContent = fmt({ hour: "numeric", minute: "2-digit", hour12: true }).replace(" ", "").toUpperCase();
+$("monthYear").textContent = fmt({ month: "long", year: "numeric" });
+$("venue").textContent = CONFIG.venue;
+$("addr").textContent = CONFIG.address;
+$("msg").textContent = CONFIG.message;
+$("rsvpBy").textContent = CONFIG.rsvpBy;
+$("mapBtn").href = "https://maps.apple.com/?q=" + encodeURIComponent(CONFIG.venue + ", " + CONFIG.address);
+CONFIG.placeholders.forEach(k => document.querySelectorAll(`[data-key="${k}"]`).forEach(el => el.classList.add("tbc")));
+
+/* Personal link: ...?to=Anh%20Tuấn  →  "For Anh Tuấn" / "Dear Anh Tuấn," */
+const params = new URLSearchParams(location.search);
+const guest = (params.get("to") || "").trim().slice(0, 40);
+if (guest) { $("toName").textContent = guest; $("dear").textContent = "Dear " + guest + ","; }
+
+/* Add to Calendar → .ics file, opens straight into iPhone Calendar */
+$("calBtn").addEventListener("click", () => {
+  const z = d => d.toISOString().replace(/[-:]/g, "").replace(/\.\d{3}/, "");
+  const esc = s => s.replace(/([,;\\])/g, "\\$1");
+  const ics = [
+    "BEGIN:VCALENDAR", "VERSION:2.0", "PRODID:-//MD//Graduation Dinner//EN", "BEGIN:VEVENT",
+    "UID:md-graduation-dinner-20261216@invite", "DTSTAMP:" + z(new Date()),
+    "DTSTART:" + z(start), "DTEND:" + z(end),
+    "SUMMARY:" + esc(CONFIG.hostShort + "'s Graduation Dinner"),
+    "LOCATION:" + esc(CONFIG.venue + ", " + CONFIG.address),
+    "END:VEVENT", "END:VCALENDAR"
+  ].join("\r\n");
+  const url = URL.createObjectURL(new Blob([ics], { type: "text/calendar" }));
+  const a = Object.assign(document.createElement("a"), { href: url, download: "graduation-dinner.ics" });
+  document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 4000);
+});
+
+/* ---------- open / close sequence ---------- */
+const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
+let opened = false, timers = [];
+function sparkle(x, y) {
+  if (reduce) return;
+  for (let i = 0; i < 18; i++) {
+    const s = document.createElement("i"); s.className = "spark";
+    const a = Math.random() * Math.PI * 2, r = 50 + Math.random() * 90;
+    s.style.cssText = `left:${x}px;top:${y}px;--dx:${Math.cos(a) * r}px;--dy:${Math.sin(a) * r}px;animation-delay:${Math.random() * .15}s`;
+    document.body.appendChild(s); setTimeout(() => s.remove(), 1600);
+  }
+}
+function openLetter() {
+  if (opened) return; opened = true;
+  const seal = document.querySelector(".seal").getBoundingClientRect();
+  sparkle(seal.left + seal.width / 2, seal.top + seal.height / 2);
+  document.body.classList.add("opening");
+  const t = reduce ? [0, 50] : [700, 2300];
+  timers.push(setTimeout(() => $("flap").classList.add("behind"), t[0]));
+  timers.push(setTimeout(() => { document.body.classList.add("show-invite"); document.body.style.overflow = "auto"; startAuto(); }, t[1]));
+}
+function closeLetter() {
+  timers.forEach(clearTimeout); timers = [];
+  document.body.classList.remove("show-invite");
+  setTimeout(() => {
+    $("flap").classList.remove("behind");
+    document.body.classList.remove("opening");
+    document.body.style.overflow = ""; opened = false; resetRsvp();
+  }, 600);
+}
+$("env").addEventListener("click", openLetter);
+$("replay").addEventListener("click", closeLetter);
+
+/* ---------- Accept / Decline ---------- */
+const decline = $("decline"), accept = $("accept");
+const lines = ["Decline", "No no, you don't love me 😢", "Nooo… really? 🥺", "My heart just broke 💔", "Please come 🥹", "I'll cry at dinner 😭", "Just press Accept 🙏"];
+let dodges = 0, busy = false;
+/* the visible screen, minus Dynamic Island / home bar and a margin for the pop bounce */
+function bounds(w, h) {
+  const vv = window.visualViewport;
+  const vw = vv ? vv.width : innerWidth, vh = vv ? vv.height : innerHeight;
+  const ox = vv ? vv.offsetLeft : 0, oy = vv ? vv.offsetTop : 0;
+  const cs = getComputedStyle($("safe"));
+  const sT = parseFloat(cs.paddingTop) || 0, sB = parseFloat(cs.paddingBottom) || 0;
+  const sL = parseFloat(cs.paddingLeft) || 0, sR = parseFloat(cs.paddingRight) || 0;
+  const m = 14;                                   // breathing room so the bounce never pokes off-screen
+  const minX = ox + sL + m, maxX = Math.max(minX, ox + vw - sR - m - w);
+  const minY = oy + Math.max(sT, 20) + m, maxY = Math.max(minY, oy + vh - Math.max(sB, 12) - m - h);
+  return { minX, maxX, minY, maxY };
+}
+function clampDecline() {
+  if (!decline.classList.contains("flee")) return;
+  const b = bounds(decline.offsetWidth, decline.offsetHeight);
+  const x = parseFloat(decline.style.left), y = parseFloat(decline.style.top);
+  decline.style.left = Math.min(Math.max(x, b.minX), b.maxX) + "px";
+  decline.style.top  = Math.min(Math.max(y, b.minY), b.maxY) + "px";
+}
+addEventListener("resize", clampDecline);
+if (window.visualViewport) visualViewport.addEventListener("resize", clampDecline);
+function flee(e) {
+  if (e && e.cancelable) e.preventDefault();
+  if (e) e.stopPropagation();
+  if (busy || decline.hidden) return; busy = true;
+  const r = decline.getBoundingClientRect();
+  if (!decline.classList.contains("flee")) {          // lift it out of the card
+    Object.assign(decline.style, { left: r.left + "px", top: r.top + "px", minWidth: Math.min(r.width, 200) + "px" });
+    decline.classList.add("flee"); document.body.appendChild(decline);
+    $("rsvp").classList.add("solo");
+  }
+  decline.classList.remove("pop"); decline.classList.add("poof");          // vanish…
+  setTimeout(() => {
+    decline.textContent = lines[1 + (dodges++ % (lines.length - 1))];
+    const w = decline.offsetWidth, h = decline.offsetHeight;
+    const a = accept.getBoundingClientRect();
+    const b = bounds(w, h);
+    let x, y, tries = 0;
+    do {
+      x = b.minX + Math.random() * (b.maxX - b.minX);
+      y = b.minY + Math.random() * (b.maxY - b.minY);
+      tries++;
+    } while (tries < 60 && (
+      (x < a.right + 14 && x + w > a.left - 14 && y < a.bottom + 14 && y + h > a.top - 14) ||   // never cover Accept
+      Math.hypot(x - r.left, y - r.top) < 160));                                             // land far away
+    decline.style.left = x + "px"; decline.style.top = y + "px";
+    decline.classList.remove("poof"); decline.classList.add("pop");            // …and pop up elsewhere
+    setTimeout(() => { busy = false; }, 380);
+  }, 170);
+}
+/* touching the button itself */
+["pointerdown", "touchstart", "mouseenter", "click"].forEach(ev =>
+  decline.addEventListener(ev, flee, { passive: false }));
+decline.addEventListener("keydown", e => { if (e.key === "Enter" || e.key === " ") flee(e); });
+/* …or just getting close to it: finger lands or slides near it, or the mouse approaches */
+function near(x, y, pad) {
+  const r = decline.getBoundingClientRect();
+  const dx = Math.max(r.left - x, 0, x - r.right), dy = Math.max(r.top - y, 0, y - r.bottom);
+  return Math.hypot(dx, dy) < pad;
+}
+const watch = (x, y, pad) => {
+  if (!document.body.classList.contains("show-invite") || decline.hidden) return;
+  if (near(x, y, pad)) flee();
+};
+document.addEventListener("touchstart", e => { const t = e.touches[0]; watch(t.clientX, t.clientY, 70); }, { passive: true });
+document.addEventListener("touchmove",  e => { const t = e.touches[0]; watch(t.clientX, t.clientY, 70); }, { passive: true });
+document.addEventListener("pointermove", e => { if (e.pointerType === "mouse") watch(e.clientX, e.clientY, 80); });
+
+accept.addEventListener("click", () => {
+  const r = accept.getBoundingClientRect();
+  sparkle(r.left + r.width / 2, r.top + r.height / 2);
+  stopAuto(); $("rsvp").hidden = true; decline.hidden = true;
+  $("thanksWhen").textContent = fmt({ weekday: "long", day: "numeric", month: "long" }) + " · " + $("time").textContent;
+  $("thanks").hidden = false;
+});
+/* iPhone has no hover — Decline hops around on its own */
+let auto = null;
+function startAuto() {
+  stopAuto();
+  auto = setTimeout(function hop() { flee(); auto = setTimeout(hop, 1600); }, 2500);   // first hop 2.5s after the card appears
+}
+function stopAuto() { clearTimeout(auto); auto = null; }
+function resetRsvp() {
+  stopAuto();
+  dodges = 0; busy = false; decline.textContent = lines[0]; decline.classList.remove("poof", "pop");
+  decline.classList.remove("flee"); decline.removeAttribute("style"); decline.hidden = false;
+  $("rsvp").appendChild(decline); $("rsvp").classList.remove("solo");
+  $("rsvp").hidden = false; $("thanks").hidden = true;
+}
+
+/* preview helpers: ?preview=open shows the inside, ?preview=play auto-opens */
+if (params.get("preview") === "open") { opened = true; document.body.classList.add("opening", "show-invite"); $("flap").classList.add("behind"); startAuto(); }
+if (params.get("preview") === "play") setTimeout(openLetter, 300);
+</script>
+</body>
+</html>
